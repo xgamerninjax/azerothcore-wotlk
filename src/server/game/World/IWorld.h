@@ -193,7 +193,8 @@ enum WorldBoolConfigs
 
 
 
-    CONFIG_ENABLE_HUNTER_PATCH
+    CONFIG_ENABLE_HUNTER_PATCH,
+    CONFIG_HUNTER_PATCH_NERF
 };
 
 enum WorldFloatConfigs

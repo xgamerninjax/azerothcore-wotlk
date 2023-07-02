@@ -665,11 +665,12 @@ void World::LoadConfigSettings(bool reload)
 
 
 
-
+    
 
 
 
     _bool_configs[CONFIG_ENABLE_HUNTER_PATCH] = sConfigMgr->GetOption<bool>("HunterPatch.Enable", true);
+    _bool_configs[CONFIG_HUNTER_PATCH_NERF] = sConfigMgr->GetOption<bool>("HunterPatch.Nerf", true);
 
 
 
