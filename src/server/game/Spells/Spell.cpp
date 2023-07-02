@@ -3584,51 +3584,42 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
             {
                 static int32 BaseAttackTime = 0;
                 int32 attackTime = m_caster->GetAttackTime(RANGED_ATTACK);
+                int32 MoveSpeed = attackTime;
+                int32 afkSpeed = attackTime;
 
+                //Check if weapon speeds need updating & calculate current speeds
                 if (BaseAttackTime == 0)
                 {
                     BaseAttackTime = attackTime;
-                    int32 newAttackTime = BaseAttackTime + (BaseAttackTime / 2);
-                    if (m_caster->isMoving())
-                    {
-                        m_caster->SetAttackTime(RANGED_ATTACK, newAttackTime);
-                    }
-                    else
-                    {
-                        m_caster->SetAttackTime(RANGED_ATTACK, BaseAttackTime);
-                    }
+                    MoveSpeed = BaseAttackTime + (BaseAttackTime / 2);
+                    afkSpeed = BaseAttackTime;
+                    
                 }
                 else if (attackTime == (BaseAttackTime + (BaseAttackTime / 2)))
                 {
-                    if (!m_caster->isMoving())
-                    {
-                        m_caster->SetAttackTime(RANGED_ATTACK, BaseAttackTime);
-                    }
+                    MoveSpeed = attackTime;
+                    afkSpeed = BaseAttackTime;
                 }
                 else if (attackTime != BaseAttackTime && attackTime != BaseAttackTime + (BaseAttackTime / 2))
                 {
                     BaseAttackTime = attackTime;
-                    int32 newAttackTime = BaseAttackTime + (BaseAttackTime / 2);
-                    if (m_caster->isMoving())
-                    {
-                        m_caster->SetAttackTime(RANGED_ATTACK, newAttackTime);
-                    }
-                    else
-                    {
-                        m_caster->SetAttackTime(RANGED_ATTACK, BaseAttackTime);
-                    }
+                    MoveSpeed = BaseAttackTime + (BaseAttackTime / 2);
+                    afkSpeed = BaseAttackTime;
                 }
                 else
                 {
-                    int32 newAttackTime = BaseAttackTime + (BaseAttackTime / 2);
-                    if (m_caster->isMoving())
-                    {
-                        m_caster->SetAttackTime(RANGED_ATTACK, newAttackTime);
-                    }
-                    else
-                    {
-                        m_caster->SetAttackTime(RANGED_ATTACK, BaseAttackTime);
-                    }
+                    MoveSpeed = BaseAttackTime + (BaseAttackTime / 2);
+                    afkSpeed = BaseAttackTime;
+                }
+
+                //Apply current speeds based on whether player is moving or not
+                if (m_caster->isMoving())
+                {
+                    m_caster->SetAttackTime(RANGED_ATTACK, MoveSpeed);
+                }
+                else
+                {
+                    m_caster->SetAttackTime(RANGED_ATTACK, afkSpeed);
                 }
             }
         }
