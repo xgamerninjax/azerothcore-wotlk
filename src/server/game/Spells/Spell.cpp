@@ -57,6 +57,7 @@
 #include "WorldPacket.h"
 
 #include <string>
+#include "Configuration/Config.h"
 
 extern pEffect SpellEffects[TOTAL_SPELL_EFFECTS];
 
@@ -3574,17 +3575,20 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
     }
 
     //Attempt to increase ranged attack speed if moving
-    if (m_spellInfo->Id == 75 && m_caster->GetTypeId() == TYPEID_PLAYER)
+    if (sConfigMgr->GetOption<bool>("HunterPatch.Enable", true))
     {
-        static int32 attackTime = m_caster->GetAttackTime(RANGED_ATTACK);
-        int32 newAttackTime = attackTime + (attackTime / 2);
-
-        //Reset it to default, just incase player is no longer moving but had it nerfed before.
-        m_caster->SetAttackTime(RANGED_ATTACK, attackTime);
-
-        if (m_caster->isMoving())
+        if (m_spellInfo->Id == 75 && m_caster->GetTypeId() == TYPEID_PLAYER)
         {
-            m_caster->SetAttackTime(RANGED_ATTACK, newAttackTime);
+            static int32 attackTime = m_caster->GetAttackTime(RANGED_ATTACK);
+            int32 newAttackTime = attackTime + (attackTime / 2);
+
+            //Reset it to default, just incase player is no longer moving but had it nerfed before.
+            m_caster->SetAttackTime(RANGED_ATTACK, attackTime);
+
+            if (m_caster->isMoving())
+            {
+                m_caster->SetAttackTime(RANGED_ATTACK, newAttackTime);
+            }
         }
     }
 

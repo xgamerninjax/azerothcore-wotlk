@@ -661,6 +661,36 @@ void World::LoadConfigSettings(bool reload)
     _int_configs[CONFIG_INTERVAL_DISCONNECT_TOLERANCE]    = sConfigMgr->GetOption<int32>("DisconnectToleranceInterval", 0);
     _bool_configs[CONFIG_STATS_SAVE_ONLY_ON_LOGOUT]       = sConfigMgr->GetOption<bool>("PlayerSave.Stats.SaveOnlyOnLogout", true);
 
+
+
+
+
+
+
+
+
+    _bool_configs[CONFIG_ENABLE_HUNTER_PATCH] = sConfigMgr->GetOption<bool>("HunterPatch.Enable", true);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     _int_configs[CONFIG_MIN_LEVEL_STAT_SAVE] = sConfigMgr->GetOption<int32>("PlayerSave.Stats.MinLevel", 0);
     if (_int_configs[CONFIG_MIN_LEVEL_STAT_SAVE] > MAX_LEVEL || int32(_int_configs[CONFIG_MIN_LEVEL_STAT_SAVE]) < 0)
     {
