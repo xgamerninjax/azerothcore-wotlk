@@ -3575,22 +3575,68 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
                 finish(false);
                 return SPELL_FAILED_MOVING;
             }
+
         }
 
         if (sConfigMgr->GetOption<bool>("HunterPatch.Nerf", true))
         {
             if (m_spellInfo->Id == 75 && m_caster->GetTypeId() == TYPEID_PLAYER)
             {
-                static int32 attackTime = m_caster->GetAttackTime(RANGED_ATTACK);
-                int32 newAttackTime = attackTime + (attackTime / 2);
+                static int32 BaseAttackTime = 0;
+                int32 attackTime = m_caster->GetAttackTime(RANGED_ATTACK);
 
-                //Reset it to default, just incase player is no longer moving but had it nerfed before.
-                m_caster->SetAttackTime(RANGED_ATTACK, attackTime);
-
-                if (m_caster->isMoving())
+                if (BaseAttackTime == 0)
                 {
-                    m_caster->SetAttackTime(RANGED_ATTACK, newAttackTime);
+                    BaseAttackTime = attackTime;
+                    int32 newAttackTime = BaseAttackTime + (BaseAttackTime / 2);
+                    if (m_caster->isMoving())
+                    {
+                        m_caster->SetAttackTime(RANGED_ATTACK, newAttackTime);
+                    }
+                    else
+                    {
+                        m_caster->SetAttackTime(RANGED_ATTACK, BaseAttackTime);
+                    }
                 }
+                else if (attackTime == (BaseAttackTime + (BaseAttackTime / 2)))
+                {
+                    if (!m_caster->isMoving())
+                    {
+                        m_caster->SetAttackTime(RANGED_ATTACK, BaseAttackTime);
+                    }
+                }
+                else if (attackTime != BaseAttackTime && attackTime != BaseAttackTime + (BaseAttackTime / 2))
+                {
+                    BaseAttackTime = attackTime;
+                    int32 newAttackTime = BaseAttackTime + (BaseAttackTime / 2);
+                    if (m_caster->isMoving())
+                    {
+                        m_caster->SetAttackTime(RANGED_ATTACK, newAttackTime);
+                    }
+                    else
+                    {
+                        m_caster->SetAttackTime(RANGED_ATTACK, BaseAttackTime);
+                    }
+                }
+                else
+                {
+                    int32 newAttackTime = BaseAttackTime + (BaseAttackTime / 2);
+                    if (m_caster->isMoving())
+                    {
+                        m_caster->SetAttackTime(RANGED_ATTACK, newAttackTime);
+                    }
+                    else
+                    {
+                        m_caster->SetAttackTime(RANGED_ATTACK, BaseAttackTime);
+                    }
+                }
+
+
+
+
+                std::cout << std::endl << std::endl;
+                std::cout << "Base Speed:" << std::to_string(BaseAttackTime) << std::endl;
+                std::cout << "Current Speed:" << std::to_string(m_caster->GetAttackTime(RANGED_ATTACK)) << std::endl;
             }
         }
     }
