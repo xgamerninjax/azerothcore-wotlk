@@ -3630,13 +3630,6 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
                         m_caster->SetAttackTime(RANGED_ATTACK, BaseAttackTime);
                     }
                 }
-
-
-
-
-                std::cout << std::endl << std::endl;
-                std::cout << "Base Speed:" << std::to_string(BaseAttackTime) << std::endl;
-                std::cout << "Current Speed:" << std::to_string(m_caster->GetAttackTime(RANGED_ATTACK)) << std::endl;
             }
         }
     }
