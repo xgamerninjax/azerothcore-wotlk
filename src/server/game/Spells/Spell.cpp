@@ -56,6 +56,8 @@
 #include "World.h"
 #include "WorldPacket.h"
 
+#include <string>
+
 extern pEffect SpellEffects[TOTAL_SPELL_EFFECTS];
 
 SpellDestination::SpellDestination()
@@ -3560,16 +3562,29 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
 
     // don't allow channeled spells / spells with cast time to be casted while moving
     // (even if they are interrupted on moving, spells with almost immediate effect get to have their effect processed before movement interrupter kicks in)
-    if ((m_spellInfo->IsChanneled() || m_casttime) && m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->isMoving() && m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT && !IsTriggered())
+    if (!m_spellInfo->Id == 75 && (m_spellInfo->IsChanneled() || m_casttime) && m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->isMoving() && m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT && !IsTriggered())
     {
-        if (!m_spellInfo->Id == 75) {
-            // 1. Has casttime, 2. Or doesn't have flag to allow action during channel
-            if (m_casttime || !m_spellInfo->IsActionAllowedChannel())
-            {
-                SendCastResult(SPELL_FAILED_MOVING);
-                finish(false);
-                return SPELL_FAILED_MOVING;
-            }
+        // 1. Has casttime, 2. Or doesn't have flag to allow action during channel
+        if (m_casttime || !m_spellInfo->IsActionAllowedChannel())
+        {
+            SendCastResult(SPELL_FAILED_MOVING);
+            finish(false);
+            return SPELL_FAILED_MOVING;
+        }
+    }
+
+    //Attempt to increase ranged attack speed if moving
+    if (m_spellInfo->Id == 75 && m_caster->GetTypeId() == TYPEID_PLAYER)
+    {
+        static int32 attackTime = m_caster->GetAttackTime(RANGED_ATTACK);
+        int32 newAttackTime = attackTime + (attackTime / 2);
+
+        //Reset it to default, just incase player is no longer moving but had it nerfed before.
+        m_caster->SetAttackTime(RANGED_ATTACK, attackTime);
+
+        if (m_caster->isMoving())
+        {
+            m_caster->SetAttackTime(RANGED_ATTACK, newAttackTime);
         }
     }
 
