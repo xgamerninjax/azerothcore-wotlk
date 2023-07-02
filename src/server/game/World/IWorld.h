@@ -183,7 +183,17 @@ enum WorldBoolConfigs
     CONFIG_STRICT_NAMES_RESERVED,
     CONFIG_STRICT_NAMES_PROFANITY,
     CONFIG_ALLOWS_RANK_MOD_FOR_PET_HEALTH,
-    BOOL_CONFIG_VALUE_COUNT
+    BOOL_CONFIG_VALUE_COUNT,
+
+
+
+
+
+
+
+
+
+    CONFIG_ENABLE_HUNTER_PATCH
 };
 
 enum WorldFloatConfigs
@@ -423,7 +433,6 @@ enum WorldIntConfigs
 
 
 
-    CONFIG_ENABLE_HUNTER_PATCH
 };
 
 /// Server rates

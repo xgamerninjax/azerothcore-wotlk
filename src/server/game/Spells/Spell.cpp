@@ -3561,22 +3561,23 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
         if (m_caster->ToPlayer()->GetCommandStatus(CHEAT_CASTTIME))
             m_casttime = 0;
 
-    // don't allow channeled spells / spells with cast time to be casted while moving
-    // (even if they are interrupted on moving, spells with almost immediate effect get to have their effect processed before movement interrupter kicks in)
-    if (!m_spellInfo->Id == 75 && (m_spellInfo->IsChanneled() || m_casttime) && m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->isMoving() && m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT && !IsTriggered())
-    {
-        // 1. Has casttime, 2. Or doesn't have flag to allow action during channel
-        if (m_casttime || !m_spellInfo->IsActionAllowedChannel())
-        {
-            SendCastResult(SPELL_FAILED_MOVING);
-            finish(false);
-            return SPELL_FAILED_MOVING;
-        }
-    }
-
     //Attempt to increase ranged attack speed if moving
     if (sConfigMgr->GetOption<bool>("HunterPatch.Enable", true))
     {
+        std::cout << "If!" << std::endl;
+        // don't allow channeled spells / spells with cast time to be casted while moving
+        // (even if they are interrupted on moving, spells with almost immediate effect get to have their effect processed before movement interrupter kicks in)
+        if (!m_spellInfo->Id == 75 && (m_spellInfo->IsChanneled() || m_casttime) && m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->isMoving() && m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT && !IsTriggered())
+        {
+            // 1. Has casttime, 2. Or doesn't have flag to allow action during channel
+            if (m_casttime || !m_spellInfo->IsActionAllowedChannel())
+            {
+                SendCastResult(SPELL_FAILED_MOVING);
+                finish(false);
+                return SPELL_FAILED_MOVING;
+            }
+        }
+
         if (m_spellInfo->Id == 75 && m_caster->GetTypeId() == TYPEID_PLAYER)
         {
             static int32 attackTime = m_caster->GetAttackTime(RANGED_ATTACK);
@@ -3588,6 +3589,21 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
             if (m_caster->isMoving())
             {
                 m_caster->SetAttackTime(RANGED_ATTACK, newAttackTime);
+            }
+        }
+    }
+    else
+    {
+        // don't allow channeled spells / spells with cast time to be casted while moving
+        // (even if they are interrupted on moving, spells with almost immediate effect get to have their effect processed before movement interrupter kicks in)
+        if ((m_spellInfo->IsChanneled() || m_casttime) && m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->isMoving() && m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT && !IsTriggered())
+        {
+            // 1. Has casttime, 2. Or doesn't have flag to allow action during channel
+            if (m_casttime || !m_spellInfo->IsActionAllowedChannel())
+            {
+                SendCastResult(SPELL_FAILED_MOVING);
+                finish(false);
+                return SPELL_FAILED_MOVING;
             }
         }
     }
@@ -5798,8 +5814,16 @@ SpellCastResult Spell::CheckCast(bool strict)
         if ((!m_caster->HasUnitMovementFlag(MOVEMENTFLAG_FALLING_FAR) || m_spellInfo->Effects[0].Effect != SPELL_EFFECT_STUCK) &&
             (IsAutoRepeat() || (m_spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED) != 0))
         {
-            if (!m_spellInfo->Id == 75)
+            if (sConfigMgr->GetOption<bool>("HunterPatch.Enable", true))
+            {
+                if (!m_spellInfo->Id == 75)
+                    return SPELL_FAILED_MOVING;
+            }
+            else
+            {
                 return SPELL_FAILED_MOVING;
+            }
+                
         }
             
     }
